@@ -1,136 +1,253 @@
  <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Voice Calculator</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #f0f2f5;
-    margin: 0;
-  }
-  .calculator {
-    background: #fff;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    text-align: center;
-    width: 350px;
-  }
-  .display {
-    width: 100%;
-    height: 50px;
-    font-size: 24px;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    text-align: right;
-    background: #f7f7f7;
-  }
-  button {
-    padding: 12px 25px;
-    font-size: 16px;
-    margin: 5px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  button:hover { opacity: 0.9; }
-  .mic-btn { background: #ff4d4f; color: #fff; }
-  .calculate-btn { background: #1890ff; color: #fff; }
-  .clear-btn { background: #52c41a; color: #fff; }
-</style>
-</head>
-<body>
-
-<div class="calculator">
-  <div id="display" class="display">0</div>
-  <button class="mic-btn" id="micBtn">🎤 Start Speaking</button>
-  <button class="calculate-btn" id="calcBtn">Calculate</button>
-  <button class="clear-btn" id="clearBtn">Clear</button>
-</div>
-
-<script>
-  const display = document.getElementById('display');
-  const micBtn = document.getElementById('micBtn');
-  const calcBtn = document.getElementById('calcBtn');
-  const clearBtn = document.getElementById('clearBtn');
-
-  let expression = '';
-  let recognizing = false;
-  let recognition;
-
-  // Check for Web Speech API support
-  if ('webkitSpeechRecognition' in window) {
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onresult = (event) => {
-      let interimTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcript = event.results[i][0].transcript.trim();
-        if (event.results[i].isFinal) {
-          expression += parseSpeech(transcript);
-        } else {
-          interimTranscript += transcript;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Voice Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
         }
-      }
-      display.textContent = expression + interimTranscript;
-    };
+        /* Custom styles for the microphone button pulse animation */
+        .pulse {
+            animation: pulse-animation 1.5s infinite;
+        }
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-    recognition.onend = () => {
-      recognizing = false;
-      micBtn.textContent = '🎤 Start Speaking';
-    };
-  } else {
-    alert('Your browser does not support Speech Recognition. Please use Chrome.');
-  }
+    <div class="w-full max-w-md mx-auto p-6 bg-gray-800 rounded-2xl shadow-2xl space-y-6">
+        <!-- Header -->
+        <header class="text-center">
+            <h1 class="text-3xl font-bold text-gray-100">Pro Voice Calculator</h1>
+            <p class="text-gray-400 mt-1">Speak your calculations</p>
+        </header>
 
-  function parseSpeech(speech) {
-    // Convert words to operators
-    return speech
-      .replace(/plus/gi, '+')
-      .replace(/minus/gi, '-')
-      .replace(/times|multiply/gi, '*')
-      .replace(/divide/gi, '/')
-      .replace(/ /g, '');
-  }
+        <!-- Display Screen -->
+        <div class="bg-gray-900 p-4 rounded-xl text-right space-y-2 min-h-[120px] flex flex-col justify-end">
+            <div id="expression" class="text-gray-400 text-2xl break-words h-16 overflow-y-auto"></div>
+            <div id="result" class="text-white text-5xl font-bold break-words">0</div>
+        </div>
 
-  micBtn.addEventListener('click', () => {
-    if (recognizing) {
-      recognition.stop();
-    } else {
-      recognition.start();
-      recognizing = true;
-      micBtn.textContent = '🎤 Listening... Click to Stop';
-    }
-  });
+        <!-- Status Message -->
+        <div id="status" class="text-center text-lg text-yellow-400 h-8 flex items-center justify-center">
+            Click the mic to start
+        </div>
 
-  calcBtn.addEventListener('click', () => {
-    try {
-      const result = eval(expression);
-      display.textContent = result;
-      expression = result.toString();
-    } catch (err) {
-      display.textContent = 'Error';
-      expression = '';
-    }
-  });
+        <!-- Controls -->
+        <div class="grid grid-cols-3 gap-4">
+            <button id="mic-btn" class="col-span-1 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white rounded-xl p-4 flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </button>
+            <div class="col-span-2 grid grid-cols-2 gap-4">
+                 <button id="calculate-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl p-4 transition-colors duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                    Calculate
+                </button>
+                <button id="clear-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl p-4 transition-colors duration-300">
+                    Clear
+                </button>
+            </div>
+        </div>
+        
+        <!-- Copy Button -->
+         <div class="flex">
+            <button id="copy-btn" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl p-4 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Copy Result</span>
+            </button>
+        </div>
+    </div>
 
-  clearBtn.addEventListener('click', () => {
-    expression = '';
-    display.textContent = '0';
-  });
-</script>
+    <script type="module">
+        // --- DOM Element References ---
+        const micBtn = document.getElementById('mic-btn');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const expressionDiv = document.getElementById('expression');
+        const resultDiv = document.getElementById('result');
+        const statusDiv = document.getElementById('status');
 
+        // --- Speech Recognition Setup ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+        } else {
+            statusDiv.textContent = "Sorry, your browser doesn't support speech recognition.";
+            micBtn.disabled = true;
+        }
+        
+        // --- State Management ---
+        let isListening = false;
+        let finalTranscript = '';
+
+        // --- Speech-to-Symbol Mapping ---
+        const wordToOperator = {
+            'plus': '+', 'add': '+',
+            'minus': '-', 'subtract': '-', 'less': '-',
+            'times': '*', 'multiply': '*', 'multiplied by': '*',
+            'divided by': '/', 'divide': '/', 'over': '/',
+            'point': '.',
+            'x': '*', // for "x" as multiplication
+            'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5',
+            'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'zero': '0',
+        };
+
+        const commands = {
+            'clear': () => clearAll(),
+            'reset': () => clearAll(),
+            'equals': () => calculateAndDisplay(),
+            'equal': () => calculateAndDisplay(),
+            'calculate': () => calculateAndDisplay(),
+        };
+
+        // --- Core Functions ---
+        function processSpeech(transcript) {
+            let processed = transcript.toLowerCase().trim();
+            
+            // Check for commands first
+            if (commands[processed]) {
+                commands[processed]();
+                return ''; // Command executed, no need to add to expression
+            }
+            
+            // Replace words with symbols
+            Object.keys(wordToOperator).forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'g');
+                processed = processed.replace(regex, wordToOperator[word]);
+            });
+
+            // Clean up the string to form a valid expression
+            return processed.replace(/\s+/g, '');
+        }
+
+        function calculateAndDisplay() {
+            if (expressionDiv.textContent === '') return;
+            try {
+                // Using a Function constructor for safer evaluation than eval()
+                // It sanitizes the input to only allow numbers and basic math operators
+                const sanitizedExpression = expressionDiv.textContent.replace(/[^-()\d/*+.]/g, '');
+                if (sanitizedExpression !== expressionDiv.textContent) {
+                    throw new Error("Invalid characters in expression");
+                }
+                const result = new Function(`return ${sanitizedExpression}`)();
+
+                if (isNaN(result) || !isFinite(result)) {
+                   throw new Error("Invalid calculation");
+                }
+                
+                resultDiv.textContent = Number(result.toFixed(10)); // Fix floating point issues
+            } catch (error) {
+                resultDiv.textContent = 'Error';
+                console.error("Calculation Error:", error);
+            }
+        }
+        
+        function clearAll() {
+            finalTranscript = '';
+            expressionDiv.textContent = '';
+            resultDiv.textContent = '0';
+            statusDiv.textContent = 'Cleared. Click the mic to start again.';
+        }
+
+        // --- Event Handlers for Speech Recognition ---
+        if (recognition) {
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('pulse');
+                statusDiv.textContent = 'Listening...';
+                calculateBtn.disabled = true;
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                micBtn.classList.remove('pulse');
+                statusDiv.textContent = 'Mic off. Click to start again.';
+                if (expressionDiv.textContent) {
+                    calculateBtn.disabled = false;
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.error("Speech Recognition Error:", event.error);
+                statusDiv.textContent = `Error: ${event.error}`;
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        const chunk = processSpeech(event.results[i][0].transcript);
+                        // Check if the command was executed
+                        if(chunk) {
+                            finalTranscript += chunk;
+                        }
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                expressionDiv.textContent = finalTranscript;
+                if (interimTranscript) {
+                    statusDiv.textContent = `Thinking: ${interimTranscript}`;
+                } else if(isListening) {
+                    statusDiv.textContent = 'Listening...';
+                }
+            };
+        }
+
+        // --- Event Handlers for Buttons ---
+        micBtn.addEventListener('click', () => {
+            if (isListening) {
+                recognition.stop();
+            } else {
+                if(recognition) recognition.start();
+            }
+        });
+
+        clearBtn.addEventListener('click', clearAll);
+        calculateBtn.addEventListener('click', calculateAndDisplay);
+
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = resultDiv.textContent;
+            
+            // A small hack for clipboard API in secure contexts/iframes
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Copied!</span>`;
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(textArea);
+        });
+
+    </script>
 </body>
 </html>
