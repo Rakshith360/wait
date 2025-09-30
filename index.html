@@ -1,30 +1,25 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Voice Calculator (Enhanced)</title>
+    <title>Pro Voice & Vision Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom styles for the microphone button pulse animation */
         .pulse {
             animation: pulse-animation 1.5s infinite;
         }
         @keyframes pulse-animation {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
+        #camera-modal { display: none; }
+        #camera-modal.flex { display: flex; }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
@@ -32,8 +27,8 @@
     <div class="w-full max-w-md mx-auto p-6 bg-gray-800 rounded-2xl shadow-2xl space-y-6">
         <!-- Header -->
         <header class="text-center">
-            <h1 class="text-3xl font-bold text-gray-100">Pro Voice Calculator</h1>
-            <p class="text-gray-400 mt-1">Speak your calculations naturally</p>
+            <h1 class="text-3xl font-bold text-gray-100">Pro Voice & Vision Calculator</h1>
+            <p class="text-gray-400 mt-1">Speak or scan your calculations</p>
         </header>
 
         <!-- Display Screen -->
@@ -44,42 +39,69 @@
 
         <!-- Status Message -->
         <div id="status" class="text-center text-lg text-yellow-400 h-8 flex items-center justify-center">
-            Click the mic to start
+            Click the mic or camera to start
         </div>
 
         <!-- Controls -->
-        <div class="grid grid-cols-3 gap-4">
-            <button id="mic-btn" class="col-span-1 bg-red-600 hover:bg-red-700 transition-all duration-300 text-white rounded-xl p-4 flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        <div class="grid grid-cols-4 gap-4">
+            <button id="mic-btn" class="bg-red-600 hover:bg-red-700 transition-all duration-300 text-white rounded-xl p-4 flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
             </button>
-            <div class="col-span-2 grid grid-cols-2 gap-4">
-                 <button id="calculate-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl p-4 transition-colors duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed">
-                     Calculate
-                 </button>
-                 <button id="clear-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl p-4 transition-colors duration-300">
-                     Clear
-                 </button>
-            </div>
+            <button id="camera-btn" class="bg-sky-600 hover:bg-sky-700 transition-all duration-300 text-white rounded-xl p-4 flex justify-center items-center focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </button>
+            <button id="calculate-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl p-4 transition-colors duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed">
+                 Calculate
+            </button>
+            <button id="clear-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl p-4 transition-colors duration-300">
+                 Clear
+            </button>
         </div>
         
         <!-- Copy Button -->
          <div class="flex">
              <button id="copy-btn" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl p-4 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                 <span>Copy Result</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                <span>Copy Result</span>
              </button>
          </div>
     </div>
+    
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="fixed inset-0 bg-black bg-opacity-80 flex-col items-center justify-center p-4">
+        <video id="camera-view" class="w-full max-w-lg h-auto rounded-lg mb-4" autoplay playsinline></video>
+        <div id="camera-status" class="text-lg text-yellow-400 mb-4 h-8">Initializing Camera...</div>
+        <div class="flex items-center gap-4">
+            <button id="capture-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full text-lg focus:outline-none focus:ring-2 focus:ring-blue-500">Capture</button>
+            <button id="upload-btn" class="text-white hover:underline">Upload Screenshot</button>
+            <button id="close-camera-btn" class="absolute top-4 right-4 text-white text-3xl font-bold">&times;</button>
+        </div>
+        <input type="file" id="image-upload" accept="image/*" class="hidden">
+    </div>
+    <canvas id="capture-canvas" class="hidden"></canvas>
+
 
     <script type="module">
         // --- DOM Element References ---
         const micBtn = document.getElementById('mic-btn');
+        const cameraBtn = document.getElementById('camera-btn');
         const calculateBtn = document.getElementById('calculate-btn');
         const clearBtn = document.getElementById('clear-btn');
         const copyBtn = document.getElementById('copy-btn');
         const expressionDiv = document.getElementById('expression');
         const resultDiv = document.getElementById('result');
         const statusDiv = document.getElementById('status');
+        
+        // Camera UI elements
+        const cameraModal = document.getElementById('camera-modal');
+        const cameraView = document.getElementById('camera-view');
+        const cameraStatus = document.getElementById('camera-status');
+        const captureBtn = document.getElementById('capture-btn');
+        const closeCameraBtn = document.getElementById('close-camera-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const imageUploadInput = document.getElementById('image-upload');
+        const captureCanvas = document.getElementById('capture-canvas');
+
 
         // --- Speech Recognition Setup ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -91,127 +113,152 @@
             recognition.lang = 'en-US';
             recognition.interimResults = true;
         } else {
-            statusDiv.textContent = "Sorry, your browser doesn't support speech recognition.";
+            statusDiv.textContent = "Speech recognition not supported.";
             micBtn.disabled = true;
         }
         
         // --- State Management ---
         let isListening = false;
         let finalTranscript = '';
+        let cameraStream = null;
 
-        // --- ENHANCED SPEECH PROCESSING LOGIC ---
+        // --- Gemini API Configuration ---
+        const GEMINI_API_KEY = ""; // Kept empty as per instructions
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
 
-        /**
-         * Converts a string of number words (e.g., "four lakh fifty thousand") into a numeric string.
-         * @param {string} text The input string containing number words.
-         * @returns {string} The resulting numeric string (e.g., "450000").
-         */
-        function textToNumber(text) {
-            if (!text) return '';
-            // If the input is already a valid number, just return it.
-            if (!isNaN(text)) return text;
+
+        // --- OCR & Image Processing ---
+        async function performOCR(base64ImageData) {
+            statusDiv.textContent = 'Analyzing image...';
+            cameraStatus.textContent = 'Analyzing...';
+
+            // Remove the base64 prefix
+            const cleanBase64 = base64ImageData.split(',')[1];
             
-            const words = text.split(/\s+/).filter(Boolean);
-
-            const numberMap = {
-                'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
-                'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19,
-                'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90
-            };
-            
-            const scaleMap = {
-                'hundred': 100, 'thousand': 1000, 'lakh': 100000, 'million': 1000000, 'crore': 10000000, 'billion': 1000000000
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: "Read the mathematical expression in the image. Return ONLY the valid, sanitized expression with no extra text. For example, if you see '5 x 4', return '5*4'." },
+                        { inlineData: { mimeType: "image/png", data: cleanBase64 } }
+                    ]
+                }]
             };
 
-            let total = 0;
-            let currentChunkValue = 0;
+            try {
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            for (let word of words) {
-                // Handle plurals like 'lakhs', 'crores'
-                word = word.replace(/s$/, '');
-
-                if (numberMap[word] !== undefined) {
-                    currentChunkValue += numberMap[word];
-                } else if (word === 'hundred') {
-                    currentChunkValue *= 100;
-                } else if (scaleMap[word] !== undefined) {
-                    // Handle cases like "a thousand", where currentChunkValue is 0
-                    if (currentChunkValue === 0) currentChunkValue = 1; 
-                    total += currentChunkValue * scaleMap[word];
-                    currentChunkValue = 0;
-                } else if (!isNaN(word)) {
-                    currentChunkValue += parseFloat(word);
-                } else {
-                    console.warn(`Unrecognized number word: ${word}`);
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.statusText}`);
                 }
-            }
-            total += currentChunkValue;
 
-            return total > 0 || text.includes('zero') || text.includes('0') ? String(total) : '';
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (text) {
+                    // Sanitize the response to keep only valid calculation characters
+                    const sanitizedText = text.replace(/[^-()\d/*+.]/g, '');
+                    expressionDiv.textContent = sanitizedText;
+                    finalTranscript = sanitizedText;
+                    statusDiv.textContent = 'Expression found! Calculate or continue.';
+                    calculateAndDisplay();
+                } else {
+                    throw new Error("No text found in the image.");
+                }
+
+            } catch (error) {
+                console.error('OCR Error:', error);
+                statusDiv.textContent = 'Could not read expression from image.';
+            } finally {
+                stopCamera();
+            }
         }
 
-        /**
-         * Processes a chunk of transcribed speech, converting it into a part of a mathematical expression.
-         * @param {string} transcript The speech-to-text transcript chunk.
-         * @returns {string} The processed string to be appended to the expression.
-         */
-        function processSpeech(transcript) {
-            let text = transcript.toLowerCase().trim();
-
-            // 1. Handle Commands first
-            const commands = {
-                'clear': () => clearAll(),
-                'reset': () => clearAll(),
-                'equals': () => calculateAndDisplay(),
-                'equal': () => calculateAndDisplay(),
-                'calculate': () => calculateAndDisplay(),
-            };
-            if (commands[text]) {
-                commands[text]();
-                return ''; // Command executed, so return empty string
-            }
-
-            // 2. Clean and standardize the text for parsing
-            text = text.replace(/,/g, '') // Removes commas, fixing the "1,000" issue
-                       .replace(/\band\b/g, ' ')
-                       .replace(/multiplied by/g, 'multiply')
-                       .replace(/divided by/g, 'divide')
-                       .replace(/a hundred/g, 'one hundred')
-                       .replace(/a thousand/g, 'one thousand')
-                       .replace(/a lakh/g, 'one lakh')
-                       .replace(/a crore/g, 'one crore');
-
-            const words = text.split(/\s+/).filter(Boolean);
-            let expressionPart = '';
-            let numberParts = [];
-
-            const operators = {
-                'plus': '+', 'add': '+',
-                'minus': '-', 'subtract': '-', 'less': '-',
-                'times': '*', 'multiply': '*', 'x': '*',
-                'divide': '/', 'over': '/',
-                'point': '.', 'dot': '.'
-            };
-
-            // 3. Loop through words, separating numbers from operators
-            for (const word of words) {
-                if (operators[word]) {
-                    // When an operator is found, process the preceding number words
-                    if (numberParts.length > 0) {
-                        expressionPart += textToNumber(numberParts.join(' '));
-                        numberParts = [];
-                    }
-                    expressionPart += operators[word];
-                } else {
-                    // If not an operator, assume it's part of a number
-                    numberParts.push(word);
+        // --- Camera Controls ---
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' } // Prefer back camera
+                });
+                cameraView.srcObject = cameraStream;
+                cameraStatus.textContent = 'Point camera at calculation';
+            } catch (err) {
+                console.error("Camera access error:", err);
+                cameraStatus.textContent = 'Camera access denied or unavailable.';
+                // Fallback for devices without a back camera
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    cameraView.srcObject = cameraStream;
+                    cameraStatus.textContent = 'Point camera at calculation';
+                } catch (fallbackErr) {
+                    console.error("Fallback camera access error:", fallbackErr);
                 }
             }
-            // Process any remaining number words at the end of the chunk
-            if (numberParts.length > 0) {
-                expressionPart += textToNumber(numberParts.join(' '));
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
             }
+            cameraModal.classList.remove('flex');
+            cameraView.srcObject = null;
+        }
+
+        cameraBtn.addEventListener('click', () => {
+            cameraModal.classList.add('flex');
+            startCamera();
+        });
+
+        closeCameraBtn.addEventListener('click', stopCamera);
+
+        captureBtn.addEventListener('click', () => {
+            const context = captureCanvas.getContext('2d');
+            captureCanvas.width = cameraView.videoWidth;
+            captureCanvas.height = cameraView.videoHeight;
+            context.drawImage(cameraView, 0, 0, captureCanvas.width, captureCanvas.height);
             
+            const imageData = captureCanvas.toDataURL('image/png');
+            performOCR(imageData);
+        });
+
+        uploadBtn.addEventListener('click', () => imageUploadInput.click());
+
+        imageUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                performOCR(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // --- ENHANCED SPEECH PROCESSING LOGIC ---
+        function textToNumber(text) {
+            if (!text) return '';
+            if (!isNaN(text)) return text;
+            const words = text.split(/\s+/).filter(Boolean);
+            const numberMap = {'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fifty':50,'sixty':60,'seventy':70,'eighty':80,'ninety':90};
+            const scaleMap = {'hundred':100,'thousand':1000,'lakh':100000,'million':1000000,'crore':10000000,'billion':1000000000};
+            let total=0,currentChunkValue=0;
+            for(let word of words){word=word.replace(/s$/,'');if(numberMap[word]!==undefined){currentChunkValue+=numberMap[word];}else if(word==='hundred'){currentChunkValue*=100;}else if(scaleMap[word]!==undefined){if(currentChunkValue===0)currentChunkValue=1;total+=currentChunkValue*scaleMap[word];currentChunkValue=0;}else if(!isNaN(word)){currentChunkValue+=parseFloat(word);}else{console.warn(`Unrecognized number word: ${word}`);}}
+            total+=currentChunkValue;
+            return total>0||text.includes('zero')||text.includes('0')?String(total):'';
+        }
+
+        function processSpeech(transcript) {
+            let text=transcript.toLowerCase().trim();
+            const commands={'clear':()=>clearAll(),'reset':()=>clearAll(),'equals':()=>calculateAndDisplay(),'equal':()=>calculateAndDisplay(),'calculate':()=>calculateAndDisplay()};
+            if(commands[text]){commands[text]();return'';}
+            text=text.replace(/,/g,'').replace(/\band\b/g,' ').replace(/multiplied by/g,'multiply').replace(/divided by/g,'divide').replace(/a hundred/g,'one hundred').replace(/a thousand/g,'one thousand').replace(/a lakh/g,'one lakh').replace(/a crore/g,'one crore');
+            const words=text.split(/\s+/).filter(Boolean);let expressionPart='';let numberParts=[];
+            const operators={'plus':'+','add':'+','minus':'-','subtract':'-','less':'-','times':'*','multiply':'*','x':'*','divide':'/','over':'/','point':'.','dot':'.'};
+            for(const word of words){if(operators[word]){if(numberParts.length>0){expressionPart+=textToNumber(numberParts.join(' '));numberParts=[];}expressionPart+=operators[word];}else{numberParts.push(word);}}
+            if(numberParts.length>0){expressionPart+=textToNumber(numberParts.join(' '));}
             return expressionPart;
         }
 
@@ -219,19 +266,12 @@
         function calculateAndDisplay() {
             if (expressionDiv.textContent === '') return;
             try {
-                // Sanitize the expression to prevent malicious code injection
                 const sanitizedExpression = expressionDiv.textContent.replace(/[^-()\d/*+.]/g, '');
-                if (sanitizedExpression !== expressionDiv.textContent) {
-                    throw new Error("Invalid characters in expression");
-                }
+                if (sanitizedExpression !== expressionDiv.textContent) throw new Error("Invalid characters in expression");
                 const result = new Function(`return ${sanitizedExpression}`)();
-
-                if (isNaN(result) || !isFinite(result)) {
-                   throw new Error("Invalid calculation");
-                }
-                
-                // Format result to a reasonable number of decimal places
+                if (isNaN(result) || !isFinite(result)) throw new Error("Invalid calculation");
                 resultDiv.textContent = Number(result.toFixed(10));
+                calculateBtn.disabled = true;
             } catch (error) {
                 resultDiv.textContent = 'Error';
                 console.error("Calculation Error:", error);
@@ -242,63 +282,22 @@
             finalTranscript = '';
             expressionDiv.textContent = '';
             resultDiv.textContent = '0';
-            statusDiv.textContent = 'Cleared. Click the mic to start again.';
+            statusDiv.textContent = 'Cleared. Click mic or camera to start.';
+            calculateBtn.disabled = true;
         }
 
         // --- Event Handlers for Speech Recognition ---
         if (recognition) {
-            recognition.onstart = () => {
-                isListening = true;
-                micBtn.classList.add('pulse');
-                statusDiv.textContent = 'Listening...';
-                calculateBtn.disabled = true;
-            };
-
-            recognition.onend = () => {
-                isListening = false;
-                micBtn.classList.remove('pulse');
-                statusDiv.textContent = 'Mic off. Click to start again.';
-                if (expressionDiv.textContent) {
-                    calculateBtn.disabled = false;
-                }
-            };
-            
-            recognition.onerror = (event) => {
-                console.error("Speech Recognition Error:", event.error);
-                statusDiv.textContent = `Error: ${event.error}`;
-            };
-
-            recognition.onresult = (event) => {
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        // Use the new, more powerful processing function
-                        const chunk = processSpeech(event.results[i][0].transcript);
-                        if(chunk) {
-                            finalTranscript += chunk;
-                        }
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
-                }
-                expressionDiv.textContent = finalTranscript;
-                expressionDiv.scrollTop = expressionDiv.scrollHeight; // Auto-scroll
-                
-                if (interimTranscript) {
-                    statusDiv.textContent = `Thinking: ${interimTranscript}`;
-                } else if(isListening) {
-                    statusDiv.textContent = 'Listening...';
-                }
-            };
+            recognition.onstart = ()=>{isListening=true;micBtn.classList.add('pulse');statusDiv.textContent='Listening...';calculateBtn.disabled=true;};
+            recognition.onend = ()=>{isListening=false;micBtn.classList.remove('pulse');statusDiv.textContent='Mic off. Click to start again.';if(expressionDiv.textContent){calculateBtn.disabled=false;}};
+            recognition.onerror = (event)=>{console.error("Speech Recognition Error:",event.error);statusDiv.textContent=`Error: ${event.error}`;};
+            recognition.onresult = (event)=>{let interimTranscript='';for(let i=event.resultIndex;i<event.results.length;++i){if(event.results[i].isFinal){const chunk=processSpeech(event.results[i][0].transcript);if(chunk){finalTranscript+=chunk;}}else{interimTranscript+=event.results[i][0].transcript;}}
+            expressionDiv.textContent=finalTranscript;expressionDiv.scrollTop=expressionDiv.scrollHeight;if(interimTranscript){statusDiv.textContent=`Thinking: ${interimTranscript}`;}else if(isListening){statusDiv.textContent='Listening...';}};
         }
 
         // --- Event Handlers for Buttons ---
         micBtn.addEventListener('click', () => {
-            if (isListening) {
-                recognition.stop();
-            } else {
-                if(recognition) recognition.start();
-            }
+            if (isListening) { recognition.stop(); } else { if(recognition) recognition.start(); }
         });
 
         clearBtn.addEventListener('click', clearAll);
@@ -306,8 +305,6 @@
 
         copyBtn.addEventListener('click', () => {
             const textToCopy = resultDiv.textContent;
-            
-            // Use a temporary textarea to copy text, works well in most environments
             const textArea = document.createElement('textarea');
             textArea.value = textToCopy;
             document.body.appendChild(textArea);
@@ -315,18 +312,13 @@
             try {
                 document.execCommand('copy');
                 const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>Copied!</span>`;
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalText;
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            }
+                copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Copied!</span>`;
+                setTimeout(() => { copyBtn.innerHTML = originalText; }, 2000);
+            } catch (err) { console.error('Failed to copy text: ', err); }
             document.body.removeChild(textArea);
         });
 
     </script>
 </body>
 </html>
+
